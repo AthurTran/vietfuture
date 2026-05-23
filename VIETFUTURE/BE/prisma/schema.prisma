@@ -1,0 +1,319 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  student
+  admin
+}
+
+enum UserStatus {
+  active
+  inactive
+}
+
+model User {
+  user_id Int @id @default(autoincrement())
+
+  full_name String
+
+  email String @unique
+
+  password_hash String
+
+  phone String?
+
+  role UserRole @default(student)
+
+  status UserStatus @default(active)
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  roadmaps Roadmap[]
+
+  aiChats AIChatHistory[]
+
+  attempts AssessmentAttempt[]
+
+  reports SkillReport[]
+
+  recommendedCourses RecommendedCourse[]
+}
+
+model Skill {
+  skill_id    Int     @id @default(autoincrement())
+  skill_name  String
+  description String?
+  category    String?
+
+  careerSkills CareerSkill[]
+  courseSkills CourseSkill[]
+}
+
+model CareerPath {
+  career_id    Int     @id @default(autoincrement())
+  career_name  String
+  description  String?
+  salary_range String?
+  demand_level String?
+
+  careerSkills CareerSkill[]
+  roadmaps     Roadmap[]
+}
+
+model CareerSkill {
+  career_skill_id Int     @id @default(autoincrement())
+  career_id       Int
+  skill_id        Int
+  required_level  String?
+
+  career CareerPath @relation(fields: [career_id], references: [career_id])
+  skill  Skill      @relation(fields: [skill_id], references: [skill_id])
+
+  @@unique([career_id, skill_id])
+}
+
+enum RoadmapStatus {
+  active
+  paused
+  completed
+}
+
+model Roadmap {
+  roadmap_id       Int           @id @default(autoincrement())
+  user_id          Int
+  career_id        Int
+  title            String
+  progress_percent Float         @default(0)
+  status           RoadmapStatus @default(active)
+  created_at       DateTime      @default(now())
+
+  user   User       @relation(fields: [user_id], references: [user_id])
+  career CareerPath @relation(fields: [career_id], references: [career_id])
+
+  roadmapCourses RoadmapCourse[]
+}
+
+model Course {
+  course_id          Int                 @id @default(autoincrement())
+  course_name        String
+  provider           String?
+  description        String?
+  level              String?
+  duration_hours     Int?
+  course_url         String?
+  updated_at         DateTime            @updatedAt
+  roadmapCourses     RoadmapCourse[]
+  courseSkills       CourseSkill[]
+  recommendedCourses RecommendedCourse[]
+}
+
+enum CourseProgressStatus {
+  not_started
+  in_progress
+  completed
+}
+
+model RoadmapCourse {
+  roadmap_course_id  Int                  @id @default(autoincrement())
+  roadmap_id         Int
+  course_id          Int
+  sequence_order     Int?
+  status             CourseProgressStatus @default(not_started)
+  completion_percent Float                @default(0)
+  roadmap            Roadmap              @relation(fields: [roadmap_id], references: [roadmap_id])
+  course             Course               @relation(fields: [course_id], references: [course_id])
+
+  @@unique([roadmap_id, course_id])
+}
+
+model CourseSkill {
+  course_skill_id Int    @id @default(autoincrement())
+  course_id       Int
+  skill_id        Int
+  course          Course @relation(fields: [course_id], references: [course_id])
+  skill           Skill  @relation(fields: [skill_id], references: [skill_id])
+
+  @@unique([course_id, skill_id])
+}
+
+model AIChatHistory {
+  chat_id    Int      @id @default(autoincrement())
+  user_id    Int
+  question   String
+  answer     String
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+}
+
+model Question {
+  question_id Int @id @default(autoincrement())
+
+  assessment_id Int
+
+  content String
+
+  question_type String
+
+  difficulty_level String?
+
+  score Float @default(1)
+
+  assessment Assessment @relation(fields: [assessment_id], references: [assessment_id])
+
+  options QuestionOption[]
+
+  answers UserAnswer[]
+}
+
+model QuestionOption {
+  option_id Int @id @default(autoincrement())
+
+  question_id Int
+
+  option_text String
+
+  is_correct Boolean @default(false)
+
+  question Question @relation(fields: [question_id], references: [question_id])
+
+  answers UserAnswer[]
+}
+
+enum AssessmentStatus {
+  in_progress
+  temp_saved
+  submitted
+  grading
+  analyzing
+  completed
+  canceled
+}
+
+model Assessment {
+  assessment_id Int @id @default(autoincrement())
+
+  title String
+
+  description String?
+
+  duration_minutes Int?
+
+  total_questions Int?
+
+  created_at DateTime @default(now())
+
+  questions Question[]
+
+  attempts AssessmentAttempt[]
+}
+
+model AssessmentAttempt {
+  attempt_id Int @id @default(autoincrement())
+
+  user_id Int
+
+  assessment_id Int
+
+  started_at DateTime?
+
+  submitted_at DateTime?
+
+  score Float?
+
+  status AssessmentStatus @default(in_progress)
+
+  analysis_result String?
+
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+
+  assessment Assessment @relation(fields: [assessment_id], references: [assessment_id])
+
+  answers UserAnswer[]
+
+  reports SkillReport[]
+}
+
+model UserAnswer {
+  answer_id Int @id @default(autoincrement())
+
+  attempt_id Int
+
+  question_id Int
+
+  selected_option_id Int?
+
+  answer_text String?
+
+  score Float?
+
+  created_at DateTime @default(now())
+
+  attempt AssessmentAttempt @relation(fields: [attempt_id], references: [attempt_id])
+
+  question Question @relation(fields: [question_id], references: [question_id])
+
+  selectedOption QuestionOption? @relation(fields: [selected_option_id], references: [option_id])
+}
+
+model SkillReport {
+  report_id Int @id @default(autoincrement())
+
+  user_id Int
+
+  attempt_id Int
+
+  overall_score Float?
+
+  strengths String?
+
+  weaknesses String?
+
+  recommendations String?
+
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+
+  attempt AssessmentAttempt @relation(fields: [attempt_id], references: [attempt_id])
+}
+
+enum RecommendationStatus {
+  ai_suggested
+  viewed
+  saved
+  skipped
+  expired
+}
+
+model RecommendedCourse {
+  recommendation_id Int @id @default(autoincrement())
+
+  user_id Int
+
+  course_id Int
+
+  status RecommendationStatus
+
+  viewed_at DateTime?
+
+  saved_at DateTime?
+
+  expired_at DateTime?
+
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id])
+
+  course Course @relation(fields: [course_id], references: [course_id])
+}
