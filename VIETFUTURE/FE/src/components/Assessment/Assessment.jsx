@@ -52,6 +52,15 @@ const skillKeywordsMapping = {
   ]
 };
 
+const normalizeAssessmentRole = (rawRole) => {
+  if (!rawRole) return "default";
+
+  const role = String(rawRole).trim();
+  if (role === "Frontend Developer") return "Frontend Engineer";
+  if (role === "Backend Developer") return "Backend Engineer";
+  return role;
+};
+
 export default function Assessment() {
   const navigate = useNavigate();
   
@@ -74,12 +83,12 @@ export default function Assessment() {
     }, 50);
 
     const savedData = JSON.parse(localStorage.getItem("devpath_analysis_result"));
-    const selectedRole = savedData?.role || "default";
+    const selectedRole = normalizeAssessmentRole(savedData?.role || "default");
     setRole(selectedRole);
 
     const fetchQuestions = async () => {
       try {
-        const response = await axiosClient.get(`/assessments/role/${selectedRole}`);
+        const response = await axiosClient.get(`/assessments/role/${encodeURIComponent(selectedRole)}`);
         if (response && response.questions) {
           const formattedQuestions = response.questions.map(q => {
             const correctIndex = q.options.findIndex(opt => opt.is_correct);

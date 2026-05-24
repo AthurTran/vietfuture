@@ -34,6 +34,26 @@ export const createAssessment = async (req: Request, res: Response) => {
     }
 };
 
+export const createQuestion = async (req: Request, res: Response) => {
+    try {
+        const assessmentId = Number(req.params.id);
+        const question = await assessmentService.createQuestionService(assessmentId, req.body);
+        return res.status(201).json(question);
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+export const deleteQuestion = async (req: Request, res: Response) => {
+    try {
+        const questionId = Number(req.params.questionId);
+        const deleted = await assessmentService.deleteQuestionService(questionId);
+        return res.status(200).json(deleted);
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 export const updateAssessment = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);

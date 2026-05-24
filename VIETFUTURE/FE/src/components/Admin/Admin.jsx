@@ -259,6 +259,17 @@ export default function AdminDashboard() {
     }
   };
 
+  const deleteCareerSkill = async (id) => {
+    if (!window.confirm("Xóa liên kết CareerSkill này?")) return;
+    try {
+      await axiosClient.delete(`/careerSkills/${id}`);
+      setCareerSkills(careerSkills.filter((cs) => cs.career_skill_id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi xóa liên kết CareerSkill");
+    }
+  };
+
   // ═══════════════════════
   //  CRUD: Course
   // ═══════════════════════
@@ -413,51 +424,51 @@ export default function AdminDashboard() {
     setShowQModal(true);
   };
 
-  const saveQuestion = (e) => {
+  const saveQuestion = async (e) => {
     e.preventDefault();
     if (!questionForm.options.some((o) => o.is_correct)) {
       alert("Phải chọn ít nhất một đáp án đúng!");
       return;
     }
-    setAssessments(
-      assessments.map((a) => {
-        if (a.assessment_id !== targetAssessId) return a;
-        const maxQId =
-          Math.max(0, ...a.questions.map((q) => q.question_id)) + 1;
-        const maxOptId =
-          Math.max(
-            0,
-            ...a.questions.flatMap((q) => q.options.map((o) => o.option_id)),
-            0,
-          ) + 1;
-        const newQ = {
-          ...questionForm,
-          question_id: maxQId,
-          assessment_id: targetAssessId,
-          options: questionForm.options.map((opt, i) => ({
-            option_id: maxOptId + i,
-            question_id: maxQId,
-            ...opt,
-          })),
-        };
-        return {
-          ...a,
-          questions: [...a.questions, newQ],
-          total_questions: a.questions.length + 1,
-        };
-      }),
-    );
-    setShowQModal(false);
+
+    try {
+      const res = await axiosClient.post(
+        `/assessments/${targetAssessId}/questions`,
+        questionForm,
+      );
+
+      setAssessments(
+        assessments.map((a) => {
+          if (a.assessment_id !== targetAssessId) return a;
+
+          return {
+            ...a,
+            questions: [...a.questions, res],
+            total_questions: a.questions.length + 1,
+          };
+        }),
+      );
+      setShowQModal(false);
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi lưu câu hỏi. Vui lòng thử lại.");
+    }
   };
 
-  const deleteQuestion = (assessId, questionId) => {
-    setAssessments(
-      assessments.map((a) => {
-        if (a.assessment_id !== assessId) return a;
-        const updated = a.questions.filter((q) => q.question_id !== questionId);
-        return { ...a, questions: updated, total_questions: updated.length };
-      }),
-    );
+  const deleteQuestion = async (assessId, questionId) => {
+    try {
+      await axiosClient.delete(`/assessments/questions/${questionId}`);
+      setAssessments(
+        assessments.map((a) => {
+          if (a.assessment_id !== assessId) return a;
+          const updated = a.questions.filter((q) => q.question_id !== questionId);
+          return { ...a, questions: updated, total_questions: updated.length };
+        }),
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi xóa câu hỏi. Vui lòng thử lại.");
+    }
   };
 
   // ═══════════════════════
@@ -1488,13 +1499,7 @@ export default function AdminDashboard() {
                       <td style={S.td}>
                         <ActionBtn
                           danger
-                          onClick={() =>
-                            setCareerSkills(
-                              careerSkills.filter(
-                                (x) => x.career_skill_id !== cs.career_skill_id,
-                              ),
-                            )
-                          }
+                          onClick={() => deleteCareerSkill(cs.career_skill_id)}
                         >
                           <Trash2 size={12} />
                         </ActionBtn>
