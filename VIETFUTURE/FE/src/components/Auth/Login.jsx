@@ -95,10 +95,18 @@ export default function LoginPage() {
                 }
                 if (response.user) {
                   localStorage.setItem("user", JSON.stringify(response.user));
+                  window.dispatchEvent(new Event("devpath_auth_change"));
+                  
+                  // Chuyển hướng theo vai trò (Role-based redirect)
+                  if (response.user.role === "admin") {
+                    navigate("/admin");
+                  } else {
+                    navigate("/");
+                  }
+                } else {
+                  window.dispatchEvent(new Event("devpath_auth_change"));
+                  navigate("/");
                 }
-
-                window.dispatchEvent(new Event("devpath_auth_change"));
-                navigate("/");
               } catch (err) {
                 console.error(err);
                 setError(

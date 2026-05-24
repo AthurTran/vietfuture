@@ -15,6 +15,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "student",
     terms: false
   });
   const [error, setError] = useState("");
@@ -44,7 +45,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    const { firstName, lastName, email, password, confirmPassword, terms } = formData;
+    const { firstName, lastName, email, password, confirmPassword, role, terms } = formData;
 
     if (!firstName || !lastName || !email || !password) {
       setError("Vui lòng điền đầy đủ các thông tin bắt buộc.");
@@ -72,7 +73,7 @@ export default function RegisterPage() {
         full_name: `${lastName} ${firstName}`.trim(),
         email,
         password,
-        role: "student"
+        role
       });
 
       // Hiển thị thông báo thành công
@@ -255,6 +256,22 @@ export default function RegisterPage() {
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+              </div>
+
+              {/* Role Selection Field */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-400">Tôi muốn đăng ký làm</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full rounded-lg border border-gray-700 bg-[#0a101f] py-2 px-3 text-sm text-white focus:border-[#00e5ff] focus:outline-none focus:ring-1 focus:ring-[#00e5ff] cursor-pointer"
+                >
+                  <option value="student">Học sinh / Sinh viên (Student)</option>
+                  <option value="professional">Người đi làm (Professional)</option>
+                  <option value="career_switcher">Người chuyển ngành (Career Switcher)</option>
+                </select>
               </div>
 
               {/* Terms Agreement */}

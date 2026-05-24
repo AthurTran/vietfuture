@@ -1,9 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  User, Mail, FileText, Map, Edit3, Camera, LogOut,
-  ChevronRight, Download, Eye, Trash2, Clock, CheckCircle,
-  BookOpen, Target, TrendingUp, ArrowLeft, Shield, Star
+  User,
+  Mail,
+  FileText,
+  Map,
+  Edit3,
+  Camera,
+  LogOut,
+  ChevronRight,
+  Download,
+  Eye,
+  Trash2,
+  Clock,
+  CheckCircle,
+  BookOpen,
+  Target,
+  TrendingUp,
+  ArrowLeft,
+  Shield,
+  Star,
 } from "lucide-react";
 import axiosClient from "../../api/axiosClient";
 
@@ -21,14 +37,15 @@ export default function UserProfile() {
     window.scrollTo(0, 0);
     const timeout = setTimeout(() => setIsAnimate(true), 50);
 
-    const stored = localStorage.getItem("user") || localStorage.getItem("devpath_user");
+    const stored =
+      localStorage.getItem("user") || localStorage.getItem("devpath_user");
     if (stored) {
       const parsed = JSON.parse(stored);
       setUser(parsed);
       // Map full_name to name field so existing form fields bind correctly
       setEditForm({
         ...parsed,
-        name: parsed.full_name || parsed.name || ""
+        name: parsed.full_name || parsed.name || "",
       });
     } else {
       navigate("/login");
@@ -47,20 +64,21 @@ export default function UserProfile() {
   const handleSaveProfile = async () => {
     try {
       // If the name was edited, save it back as full_name for backend consistency
-      const updated = { 
-        ...user, 
+      const updated = {
+        ...user,
         ...editForm,
-        full_name: editForm.name || editForm.full_name || user.full_name || user.name
+        full_name:
+          editForm.name || editForm.full_name || user.full_name || user.name,
       };
-      
+
       if (updated.user_id) {
         const payload = {
           full_name: updated.full_name,
-          phone: updated.phone || null
+          phone: updated.phone || null,
         };
         await axiosClient.put(`/users/${updated.user_id}`, payload);
       }
-      
+
       localStorage.setItem("user", JSON.stringify(updated));
       localStorage.setItem("devpath_user", JSON.stringify(updated));
       setUser(updated);
@@ -140,7 +158,9 @@ export default function UserProfile() {
           <div className="flex items-center gap-1.5 text-xl font-extrabold">
             <span className="text-white">Dev</span>
             <span className="text-[#00E5FF]">Path</span>
-            <span className="font-medium text-white/70 text-base ml-0.5">AI</span>
+            <span className="font-medium text-white/70 text-base ml-0.5">
+              AI
+            </span>
           </div>
           <button
             onClick={handleLogout}
@@ -254,8 +274,12 @@ export default function UserProfile() {
               onCancel={() => setIsEditing(false)}
             />
           )}
-          {activeTab === "cv" && <CVTab analysisResult={analysisResult} navigate={navigate} />}
-          {activeTab === "roadmap" && <RoadmapTab analysisResult={analysisResult} navigate={navigate} />}
+          {activeTab === "cv" && (
+            <CVTab analysisResult={analysisResult} navigate={navigate} />
+          )}
+          {activeTab === "roadmap" && (
+            <RoadmapTab analysisResult={analysisResult} navigate={navigate} />
+          )}
         </div>
       </div>
     </div>
@@ -263,11 +287,34 @@ export default function UserProfile() {
 }
 
 /* ─── PROFILE TAB ─── */
-function ProfileTab({ user, isEditing, editForm, setEditForm, onSave, onCancel }) {
+function ProfileTab({
+  user,
+  isEditing,
+  editForm,
+  setEditForm,
+  onSave,
+  onCancel,
+}) {
   const fields = [
-    { key: "name", label: "Họ và tên", placeholder: "Nguyễn Văn A", icon: User },
-    { key: "email", label: "Email", placeholder: "email@example.com", icon: Mail, disabled: true },
-    { key: "phone", label: "Số điện thoại", placeholder: "0901 234 567", icon: null },
+    {
+      key: "name",
+      label: "Họ và tên",
+      placeholder: "Nguyễn Văn A",
+      icon: User,
+    },
+    {
+      key: "email",
+      label: "Email",
+      placeholder: "email@example.com",
+      icon: Mail,
+      disabled: true,
+    },
+    {
+      key: "phone",
+      label: "Số điện thoại",
+      placeholder: "0901 234 567",
+      icon: null,
+    },
   ];
 
   return (
@@ -290,13 +337,17 @@ function ProfileTab({ user, isEditing, editForm, setEditForm, onSave, onCancel }
                   <input
                     type="text"
                     value={editForm[key] || ""}
-                    onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}
+                    onChange={(e) =>
+                      setEditForm((f) => ({ ...f, [key]: e.target.value }))
+                    }
                     placeholder={placeholder}
                     className="w-full rounded-lg border border-gray-700 bg-[#0a101f] py-2.5 px-3 text-sm text-white placeholder-gray-600 focus:border-[#00e5ff] focus:outline-none focus:ring-1 focus:ring-[#00e5ff]"
                   />
                 ) : (
                   <div className="py-2.5 px-3 rounded-lg bg-[#0a101f]/60 border border-white/5 text-sm text-white min-h-[40px]">
-                    {(key === "name" ? (user.full_name || user.name) : user[key]) || (
+                    {(key === "name"
+                      ? user.full_name || user.name
+                      : user[key]) || (
                       <span className="text-[#6b7a95]">{placeholder}</span>
                     )}
                   </div>
@@ -312,7 +363,9 @@ function ProfileTab({ user, isEditing, editForm, setEditForm, onSave, onCancel }
               {isEditing ? (
                 <textarea
                   value={editForm.bio || ""}
-                  onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, bio: e.target.value }))
+                  }
                   placeholder="Viết vài dòng về bản thân..."
                   rows={3}
                   className="w-full rounded-lg border border-gray-700 bg-[#0a101f] py-2.5 px-3 text-sm text-white placeholder-gray-600 focus:border-[#00e5ff] focus:outline-none focus:ring-1 focus:ring-[#00e5ff] resize-none"
@@ -354,16 +407,29 @@ function ProfileTab({ user, isEditing, editForm, setEditForm, onSave, onCancel }
           </h3>
           <div className="space-y-3">
             {[
-              { label: "Ngày tham gia", value: user.joinedDate || "23/05/2025", icon: Clock },
-              { label: "Lộ trình đang theo", value: user.role || "Chưa xác định", icon: Target },
+              {
+                label: "Ngày tham gia",
+                value: user.joinedDate || "23/05/2025",
+                icon: Clock,
+              },
+              {
+                label: "Lộ trình đang theo",
+                value: user.role || "Chưa xác định",
+                icon: Target,
+              },
               { label: "Tiến độ học", value: "32%", icon: TrendingUp },
             ].map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+              <div
+                key={label}
+                className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
+              >
                 <div className="flex items-center gap-2 text-xs text-[#6b7a95]">
                   <Icon size={13} />
                   {label}
                 </div>
-                <span className="text-xs font-semibold text-white">{value}</span>
+                <span className="text-xs font-semibold text-white">
+                  {value}
+                </span>
               </div>
             ))}
           </div>
@@ -372,7 +438,9 @@ function ProfileTab({ user, isEditing, editForm, setEditForm, onSave, onCancel }
         <div className="rounded-2xl border border-[#00e5ff]/15 bg-[#00e5ff]/5 p-5">
           <div className="flex items-center gap-2 mb-2">
             <Star size={14} className="text-[#00e5ff]" />
-            <span className="text-sm font-bold text-[#00e5ff]">Nâng cấp Pro</span>
+            <span className="text-sm font-bold text-[#00e5ff]">
+              Nâng cấp Pro
+            </span>
           </div>
           <p className="text-xs text-[#6b7a95] mb-3">
             Mở khoá AI mentor cá nhân và theo dõi tiến độ nâng cao.
@@ -411,18 +479,33 @@ function CVTab({ analysisResult, navigate }) {
                 <FileText size={22} className="text-[#00e5ff]" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm text-white truncate">resume_cv.pdf</div>
-                <div className="text-xs text-[#6b7a95] mt-0.5">PDF • ~1.2 MB • Upload lúc 14:30</div>
-                <div className="text-xs text-[#00e5ff] mt-1 font-medium">Vị trí: {analysisResult.role}</div>
+                <div className="font-bold text-sm text-white truncate">
+                  resume_cv.pdf
+                </div>
+                <div className="text-xs text-[#6b7a95] mt-0.5">
+                  PDF • ~1.2 MB • Upload lúc 14:30
+                </div>
+                <div className="text-xs text-[#00e5ff] mt-1 font-medium">
+                  Vị trí: {analysisResult.role}
+                </div>
               </div>
               <div className="flex gap-2 shrink-0">
-                <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#6b7a95] hover:text-white transition-all" title="Xem">
+                <button
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#6b7a95] hover:text-white transition-all"
+                  title="Xem"
+                >
                   <Eye size={15} />
                 </button>
-                <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#6b7a95] hover:text-white transition-all" title="Tải về">
+                <button
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#6b7a95] hover:text-white transition-all"
+                  title="Tải về"
+                >
                   <Download size={15} />
                 </button>
-                <button className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all" title="Xoá">
+                <button
+                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
+                  title="Xoá"
+                >
                   <Trash2 size={15} />
                 </button>
               </div>
@@ -436,7 +519,10 @@ function CVTab({ analysisResult, navigate }) {
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {analysisResult.skills?.map((skill) => (
-                    <span key={skill} className="bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] font-medium px-2.5 py-1 rounded-lg">
+                    <span
+                      key={skill}
+                      className="bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] font-medium px-2.5 py-1 rounded-lg"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -449,7 +535,10 @@ function CVTab({ analysisResult, navigate }) {
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {analysisResult.missing?.map((skill) => (
-                    <span key={skill} className="bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[11px] font-medium px-2.5 py-1 rounded-lg">
+                    <span
+                      key={skill}
+                      className="bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[11px] font-medium px-2.5 py-1 rounded-lg"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -473,7 +562,8 @@ function CVTab({ analysisResult, navigate }) {
           </div>
           <h3 className="text-lg font-bold mb-2">Chưa có CV nào</h3>
           <p className="text-sm text-[#6b7a95] mb-6 max-w-xs mx-auto">
-            Upload CV của bạn để AI phân tích kỹ năng và tạo lộ trình học tập cá nhân hoá.
+            Upload CV của bạn để AI phân tích kỹ năng và tạo lộ trình học tập cá
+            nhân hoá.
           </p>
           <button
             onClick={() => navigate("/upload")}
@@ -526,7 +616,8 @@ function RoadmapTab({ analysisResult, navigate }) {
         </div>
         <h3 className="text-lg font-bold mb-2">Chưa có lộ trình</h3>
         <p className="text-sm text-[#6b7a95] mb-6 max-w-xs mx-auto">
-          Upload CV và hoàn thành bài đánh giá để nhận lộ trình học tập cá nhân hoá từ AI.
+          Upload CV và hoàn thành bài đánh giá để nhận lộ trình học tập cá nhân
+          hoá từ AI.
         </p>
         <button
           onClick={() => navigate("/upload")}
@@ -548,7 +639,9 @@ function RoadmapTab({ analysisResult, navigate }) {
               <Map size={16} className="text-[#7c3aed]" />
               Lộ trình: {analysisResult.role}
             </h2>
-            <p className="text-xs text-[#6b7a95]">Được tạo bởi AI dựa trên phân tích CV của bạn</p>
+            <p className="text-xs text-[#6b7a95]">
+              Được tạo bởi AI dựa trên phân tích CV của bạn
+            </p>
           </div>
           <button
             onClick={() => navigate("/roadmap")}
@@ -581,14 +674,17 @@ function RoadmapTab({ analysisResult, navigate }) {
                 p.status === "completed"
                   ? "border-green-500/20 bg-green-500/5"
                   : p.status === "in-progress"
-                  ? "border-[#00e5ff]/20 bg-[#00e5ff]/5"
-                  : "border-white/5 bg-white/2 opacity-50"
+                    ? "border-[#00e5ff]/20 bg-[#00e5ff]/5"
+                    : "border-white/5 bg-white/2 opacity-50"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {p.status === "completed" ? (
-                    <CheckCircle size={14} className="text-green-400 shrink-0" />
+                    <CheckCircle
+                      size={14}
+                      className="text-green-400 shrink-0"
+                    />
                   ) : p.status === "in-progress" ? (
                     <div className="w-3.5 h-3.5 rounded-full border-2 border-[#00e5ff] border-t-transparent animate-spin shrink-0" />
                   ) : (
@@ -608,15 +704,15 @@ function RoadmapTab({ analysisResult, navigate }) {
                       p.status === "completed"
                         ? "bg-green-500/15 text-green-400"
                         : p.status === "in-progress"
-                        ? "bg-[#00e5ff]/15 text-[#00e5ff]"
-                        : "bg-white/5 text-[#6b7a95]"
+                          ? "bg-[#00e5ff]/15 text-[#00e5ff]"
+                          : "bg-white/5 text-[#6b7a95]"
                     }`}
                   >
                     {p.status === "completed"
                       ? "Hoàn thành"
                       : p.status === "in-progress"
-                      ? "Đang học"
-                      : "Chưa mở"}
+                        ? "Đang học"
+                        : "Chưa mở"}
                   </span>
                 </div>
               </div>
@@ -663,9 +759,14 @@ function RoadmapTab({ analysisResult, navigate }) {
           </div>
           <div>
             <div className="font-bold text-sm">Xem lộ trình đầy đủ</div>
-            <div className="text-xs text-[#6b7a95]">Sơ đồ chi tiết & tài nguyên học</div>
+            <div className="text-xs text-[#6b7a95]">
+              Sơ đồ chi tiết & tài nguyên học
+            </div>
           </div>
-          <ChevronRight size={16} className="ml-auto text-[#6b7a95] group-hover:text-white transition-colors" />
+          <ChevronRight
+            size={16}
+            className="ml-auto text-[#6b7a95] group-hover:text-white transition-colors"
+          />
         </button>
 
         <button
@@ -677,9 +778,14 @@ function RoadmapTab({ analysisResult, navigate }) {
           </div>
           <div>
             <div className="font-bold text-sm">Khoá học đề xuất</div>
-            <div className="text-xs text-[#6b7a95]">Dựa trên kỹ năng còn thiếu của bạn</div>
+            <div className="text-xs text-[#6b7a95]">
+              Dựa trên kỹ năng còn thiếu của bạn
+            </div>
           </div>
-          <ChevronRight size={16} className="ml-auto text-[#6b7a95] group-hover:text-white transition-colors" />
+          <ChevronRight
+            size={16}
+            className="ml-auto text-[#6b7a95] group-hover:text-white transition-colors"
+          />
         </button>
       </div>
     </div>

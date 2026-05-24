@@ -21,10 +21,11 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(express.urlencoded({
-    extended: true
-}));
-
+app.use(
+  express.urlencoded({
+    extended: true,
+  }),
+);
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -32,30 +33,32 @@ app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/roadmaps", roadmapRoutes);
 app.use("/api/skills", skillRoutes);
-app.use("/api/careers", careerPathRoutes);
-app.use("/api/career-skills", careerSkillRoutes);
+//app.use("/api/careers", careerPathRoutes);
+//app.use("/api/career-skills", careerSkillRoutes);
 app.use("/api/roadmap-courses", roadmapCourseRoutes);
-app.use("/api/course-skills", courseSkillRoutes);
+//app.use("/api/course-skills", courseSkillRoutes);
 app.use("/api/ai-chat-history", aichathistoryRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/assessments", assessmentRoutes);
-
+app.use("/api/careerPaths", careerPathRoutes);
+app.use("/api/courseSkills", courseSkillRoutes);
+app.use("/api/careerSkills", careerSkillRoutes);
 // Health check
 app.get("/", (req, res) => {
-    return res.json({
-        message: "VietFuture API running"
-    });
+  return res.json({
+    message: "VietFuture API running",
+  });
 });
 
 // 404
 app.use((req, res) => {
-    return res.status(404).json({
-        message: "Route not found"
-    });
+  return res.status(404).json({
+    message: "Route not found",
+  });
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running at port ${PORT}`);
+  console.log(`Server running at port ${PORT}`);
 });
 
 export default app;
